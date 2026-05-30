@@ -19,12 +19,12 @@
         button:hover { background-color: #45a049; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         
-        /* 彈出文字方塊樣式 */
+        /* 彈出 LINE 複製框樣式 */
         .result-box { display: none; margin-top: 25px; padding: 20px; background-color: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 8px; }
         .result-box h3 { margin-top: 0; color: #2e7d32; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
         .copy-btn { width: auto; padding: 6px 12px; font-size: 13px; background-color: #2e7d32; margin-bottom: 0; }
         .copy-btn:hover { background-color: #1b5e20; }
-        .text-output { width: 100%; height: 130px; background-color: #fff; border: 1px solid #c8e6c9; border-radius: 4px; padding: 10px; font-size: 14px; color: #333; resize: none; font-family: monospace; }
+        .text-output { width: 100%; height: 140px; background-color: #fff; border: 1px solid #c8e6c9; border-radius: 4px; padding: 10px; font-size: 14px; color: #333; resize: none; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -32,7 +32,6 @@
 <div class="container">
     <h2>員工請假單</h2>
     <form id="leaveForm">
-        <!-- 增加部門欄位 -->
         <div class="form-group">
             <label>所屬部門</label>
             <select id="department" required>
@@ -55,20 +54,17 @@
             <input type="date" id="date" required>
         </div>
 
-        <!-- 請假時間段改為滾輪選擇器 -->
         <div class="time-range-group form-group">
             <div class="form-group">
-                <label>開始時間 (30分為單位)</label>
-                <!-- step="1800" 代表 30 分鐘一個間隔 -->
+                <label>開始時間</label>
                 <input type="time" id="startTime" required step="1800">
             </div>
             <div class="form-group">
-                <label>結束時間 (30分為單位)</label>
+                <label>結束時間</label>
                 <input type="time" id="endTime" required step="1800">
             </div>
         </div>
 
-        <!-- 自動計算請假時數 -->
         <div class="form-group">
             <label>請假時數 (小時)</label>
             <input type="number" id="hours" readonly placeholder="系統將自動計算" step="0.5">
@@ -82,7 +78,6 @@
         <button type="submit" id="submitBtn">送出請假申請</button>
     </form>
 
-    <!-- 送出成功後顯示的小文字檔框 -->
     <div class="result-box" id="resultBox">
         <h3>
             <span>📋 請複製下方文字貼到 LINE 群組</span>
@@ -93,15 +88,13 @@
 </div>
 
 <script>
-    // ⚠️ 這裡填入你目前的 Google GAS Web App 網址 
-    // (如果使用 LINE Notify 方案，直接填入該 GAS 網址即可)
-    const gasWebUrl = "https://script.google.com/macros/s/AKfycbwQzGieIQlF6_7QsxwG2Y4RCiYOGNh06gKMSZieamAhvhb9w8EBY2zEphw-lA8rB6b_/exec"; 
+    // 已經幫你整合換成你給的最新正確網址了！
+    const gasWebUrl = "https://script.google.com/macros/s/AKfycbzUhkp0A2__Mnf-A3nD2fjBVLfGExLXiNnl3CDJbKU3Ykg0Ua85G9fN9kYWdaz1GhXN/exec"; 
 
     const startTimeInput = document.getElementById('startTime');
     const endTimeInput = document.getElementById('endTime');
     const hoursInput = document.getElementById('hours');
 
-    // 監聽時間變動，自動計算請假時數
     [startTimeInput, endTimeInput].forEach(input => {
         input.addEventListener('change', calculateHours);
     });
@@ -113,28 +106,20 @@
         if (start && end) {
             const startParts = start.split(':');
             const endParts = end.split(':');
-            
-            // 轉化為分鐘計算
             const startMinutes = parseInt(startParts[0], 10) * 60 + parseInt(startParts[1], 10);
             const endMinutes = parseInt(endParts[0], 10) * 60 + parseInt(endParts[1], 10);
-            
             let diffMinutes = endMinutes - startMinutes;
             
             if (diffMinutes <= 0) {
                 hoursInput.value = "";
                 return;
             }
-            
-            // 計算小時數，保留一位小數（例如：1.5 小時）
-            const calculatedHours = (diffMinutes / 60).toFixed(1);
-            hoursInput.value = parseFloat(calculatedHours); // 轉成數字去掉無用的小數點.0
+            hoursInput.value = parseFloat((diffMinutes / 60).toFixed(1));
         }
     }
 
-    // 表單送出事件
     document.getElementById('leaveForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         if (!hoursInput.value || parseFloat(hoursInput.value) <= 0) {
             alert('❌ 結束時間必須晚於開始時間！');
             return;
@@ -144,10 +129,7 @@
         submitBtn.disabled = true;
         submitBtn.innerText = "處理中，請稍候...";
 
-        // 整理時間段格式
         const formattedTimeRange = `${startTimeInput.value} ~ ${endTimeInput.value}`;
-
-        // 收集表單資料 (包含部門)
         const formData = {
             dept: document.getElementById('department').value,
             name: document.getElementById('name').value,
@@ -157,7 +139,6 @@
             reason: document.getElementById('reason').value
         };
 
-        // 發送到後台 Google GAS
         fetch(gasWebUrl, {
             method: 'POST',
             body: JSON.stringify(formData)
@@ -165,10 +146,9 @@
         .then(response => response.json())
         .then(data => {
             if(data.status === 'success') {
-                alert('🎉 請假登記成功！');
+                alert('🎉 請假登記成功！資料已寫入試算表。');
                 
-                // 組裝給用戶貼到 LINE 的小文字檔格式
-                const lineMessage = `🚨 【請假報告】\n` +
+                const lineMessage = `📢 【請假報告】\n` +
                                     `▪️ 部門：${formData.dept}\n` +
                                     `▪️ 請假人：${formData.name}\n` +
                                     `▪️ 請假日期：${formData.date}\n` +
@@ -176,22 +156,17 @@
                                     `▪️ 請假時數：${formData.hours} 小時\n` +
                                     `▪️ 請假事由：${formData.reason}`;
                 
-                // 秀出文字框並填入內容
                 document.getElementById('textOutput').value = lineMessage;
                 document.getElementById('resultBox').style.display = 'block';
-                
-                // 滾動畫面到最下方方便複製
                 document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
-                
-                // 重設表單（保留剛才的複製框）
                 document.getElementById('leaveForm').reset();
             } else {
-                alert('❌ 後台發生錯誤，請聯絡管理員！');
+                alert('❌ 資料庫寫入失敗，請確認 GAS 權限設定！');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('❌ 網路連線失敗，請確認 GAS 網址是否正確！');
+            alert('❌ 網路連線失敗，請確認 GAS 網址是否已發佈！');
         })
         .finally(() => {
             submitBtn.disabled = false;
@@ -199,12 +174,10 @@
         });
     });
 
-    // 一鍵複製功能
     function copyToClipboard() {
         const textOutput = document.getElementById('textOutput');
         textOutput.select();
-        textOutput.setSelectionRange(0, 99999); // 針對手機優化
-        
+        textOutput.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(textOutput.value)
             .then(() => {
                 const copyBtn = document.getElementById('copyBtn');
@@ -215,11 +188,8 @@
                     copyBtn.style.backgroundColor = "#2e7d32";
                 }, 2000);
             })
-            .catch(() => {
-                alert("複製失敗，請手動全選文字複製！");
-            });
+            .catch(() => { alert("複製失敗，請手動複製文字！"); });
     }
 </script>
-
 </body>
 </html>
