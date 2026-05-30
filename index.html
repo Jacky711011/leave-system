@@ -3,91 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>員工請假系統</title>
+    <title>員工請假系統 | Leave Application System</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
         .container { max-width: 500px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin: 0 auto; }
-        h2 { text-align: center; color: #333; margin-bottom: 25px; font-weight: 600; }
+        h2 { text-align: center; color: #333; margin-bottom: 25px; font-weight: 600; font-size: 22px; line-height: 1.4; }
         .form-group { margin-bottom: 20px; }
         .time-range-group { display: flex; gap: 15px; }
         .time-range-group .form-group { flex: 1; margin-bottom: 0; }
         label { display: block; margin-bottom: 8px; color: #555; font-weight: bold; font-size: 14px; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; transition: border 0.3s; }
+        label span { font-size: 12px; color: #777; font-weight: normal; margin-left: 4px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 15px; transition: border 0.3s; }
         input:focus, textarea:focus, select:focus { border-color: #4CAF50; outline: none; }
         input[readonly] { background-color: #f9f9f9; color: #666; cursor: not-allowed; }
-        button { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 18px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        button { width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
         button:hover { background-color: #45a049; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         
         /* 彈出 LINE 複製框樣式 */
         .result-box { display: none; margin-top: 25px; padding: 20px; background-color: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 8px; }
-        .result-box h3 { margin-top: 0; color: #2e7d32; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .result-box h3 { margin-top: 0; color: #2e7d32; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
         .copy-btn { width: auto; padding: 6px 12px; font-size: 13px; background-color: #2e7d32; margin-bottom: 0; }
         .copy-btn:hover { background-color: #1b5e20; }
-        .text-output { width: 100%; height: 140px; background-color: #fff; border: 1px solid #c8e6c9; border-radius: 4px; padding: 10px; font-size: 14px; color: #333; resize: none; font-family: monospace; }
+        .text-output { width: 100%; height: 210px; background-color: #fff; border: 1px solid #c8e6c9; border-radius: 4px; padding: 10px; font-size: 13px; color: #333; resize: none; font-family: monospace; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>員工請假單</h2>
+    <h2>員工請假單<br><span style="font-size: 16px; color: #666; font-weight: normal;">Leave Application Form</span></h2>
     <form id="leaveForm">
+        
         <div class="form-group">
-            <label>所屬部門</label>
+            <label>所屬部門 <span>Department</span></label>
             <select id="department" required>
-                <option value="" disabled selected>請選擇部門</option>
-                <option value="管理部">管理部</option>
-                <option value="業務部">業務部</option>
-                <option value="製造部">製造部</option>
-                <option value="財會部">財會部</option>
+                <option value="" disabled selected>請選擇部門 / Select Department</option>
+                <option value="管理部">管理部 / Management</option>
+                <option value="業務部">業務部 / Sales</option>
+                <option value="製造部">製造部 / Manufacturing</option>
+                <option value="財會部">財會部 / Finance</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>請假人姓名</label>
-            <input type="text" id="name" required placeholder="請輸入姓名">
+            <label>請假人姓名 <span>Name</span></label>
+            <input type="text" id="name" required placeholder="請輸入姓名 / Enter your name">
         </div>
 
         <div class="form-group">
-            <label>請假日期</label>
+            <label>請假日期 <span>Date</span></label>
             <input type="date" id="date" required>
         </div>
 
         <div class="time-range-group form-group">
             <div class="form-group">
-                <label>開始時間</label>
+                <label>開始時間 <span>Start Time</span></label>
                 <input type="time" id="startTime" required step="1800">
             </div>
             <div class="form-group">
-                <label>結束時間</label>
+                <label>結束時間 <span>End Time</span></label>
                 <input type="time" id="endTime" required step="1800">
             </div>
         </div>
 
         <div class="form-group">
-            <label>請假時數 (小時)</label>
-            <input type="number" id="hours" readonly placeholder="系統將自動計算" step="0.5">
+            <label>請假時數 <span>Total Hours</span></label>
+            <input type="number" id="hours" readonly placeholder="系統自動計算 / Auto calculated" step="0.5">
         </div>
 
         <div class="form-group">
-            <label>請假事由</label>
-            <textarea id="reason" rows="3" required placeholder="請註明請假原因"></textarea>
+            <label>請假事由 <span>Reason for Leave</span></label>
+            <textarea id="reason" rows="3" required placeholder="請註明原因 / State your reason"></textarea>
         </div>
 
-        <button type="submit" id="submitBtn">送出請假申請</button>
+        <button type="submit" id="submitBtn">送出請假申請 / Submit</button>
     </form>
 
     <div class="result-box" id="resultBox">
         <h3>
-            <span>📋 請複製下方文字貼到 LINE 群組</span>
-            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">一鍵複製</button>
+            <span>📋 請複製文字貼到 LINE 群組 (Please copy to LINE)</span>
+            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">一鍵複製 / Copy</button>
         </h3>
         <textarea class="text-output" id="textOutput" readonly></textarea>
     </div>
 </div>
 
 <script>
-    // 已經幫你整合換成你給的最新正確網址了！
+    // 延用你最新發佈的 GAS 網址
     const gasWebUrl = "https://script.google.com/macros/s/AKfycbzUhkp0A2__Mnf-A3nD2fjBVLfGExLXiNnl3CDJbKU3Ykg0Ua85G9fN9kYWdaz1GhXN/exec"; 
 
     const startTimeInput = document.getElementById('startTime');
@@ -120,17 +122,29 @@
     document.getElementById('leaveForm').addEventListener('submit', function(e) {
         e.preventDefault();
         if (!hoursInput.value || parseFloat(hoursInput.value) <= 0) {
-            alert('❌ 結束時間必須晚於開始時間！');
+            alert('❌ 結束時間必須晚於開始時間！\nEnd time must be later than start time!');
             return;
         }
         
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerText = "處理中，請稍候...";
+        submitBtn.innerText = "處理中... / Processing...";
 
         const formattedTimeRange = `${startTimeInput.value} ~ ${endTimeInput.value}`;
+        const selectedDept = document.getElementById('department').value;
+        
+        // 對應英文部門名稱，優化 LINE 訊息顯示
+        const deptMap = {
+            "管理部": "管理部 (Management)",
+            "業務部": "業務部 (Sales)",
+            "行銷部": "行銷部 (Marketing)",
+            "技術研發部": "技術研發部 (R&D)",
+            "財會部": "財會部 (Finance)"
+        };
+        const displayDept = deptMap[selectedDept] || selectedDept;
+
         const formData = {
-            dept: document.getElementById('department').value,
+            dept: selectedDept, // 傳給 Google 試算表依然保持乾淨的中文，方便後續統計
             name: document.getElementById('name').value,
             date: document.getElementById('date').value,
             timeRange: formattedTimeRange,
@@ -145,31 +159,32 @@
         .then(response => response.json())
         .then(data => {
             if(data.status === 'success') {
-                alert('🎉 請假登記成功！資料已寫入試算表。');
+                alert('🎉 請假登記成功！\nApplication submitted successfully!');
                 
-                const lineMessage = `📢 【請假報告】\n` +
-                                    `▪️ 部門：${formData.dept}\n` +
-                                    `▪️ 請假人：${formData.name}\n` +
-                                    `▪️ 請假日期：${formData.date}\n` +
-                                    `▪️ 請假時間：${formData.timeRange}\n` +
-                                    `▪️ 請假時數：${formData.hours} 小時\n` +
-                                    `▪️ 請假事由：${formData.reason}`;
+                // LINE 複製框內容升級為「中英雙語對照」
+                const lineMessage = `📢 【請假報告 / Leave Notification】\n` +
+                                    `▪️ 部門/Dept：${displayDept}\n` +
+                                    `▪️ 姓名/Name：${formData.name}\n` +
+                                    `▪️ 日期/Date：${formData.date}\n` +
+                                    `▪️ 時間/Time：${formData.timeRange}\n` +
+                                    `▪️ 時數/Hours：${formData.hours} 小時/Hours\n` +
+                                    `▪️ 事由/Reason：${formData.reason}`;
                 
                 document.getElementById('textOutput').value = lineMessage;
                 document.getElementById('resultBox').style.display = 'block';
                 document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
                 document.getElementById('leaveForm').reset();
             } else {
-                alert('❌ 資料庫寫入失敗，請確認 GAS 權限設定！');
+                alert('❌ 發生錯誤，請聯絡管理員。\nError occurred, please contact administrator.');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('❌ 網路連線失敗，請確認 GAS 網址是否已發佈！');
+            alert('❌ 網路連線失敗，請稍後再試！\nConnection failed, please try again.');
         })
         .finally(() => {
             submitBtn.disabled = false;
-            submitBtn.innerText = "送出請假申請";
+            submitBtn.innerText = "送出請假申請 / Submit";
         });
     });
 
@@ -180,14 +195,14 @@
         navigator.clipboard.writeText(textOutput.value)
             .then(() => {
                 const copyBtn = document.getElementById('copyBtn');
-                copyBtn.innerText = "✓ 已複製";
+                copyBtn.innerText = "✓ 已複製/Copied";
                 copyBtn.style.backgroundColor = "#1b5e20";
                 setTimeout(() => {
-                    copyBtn.innerText = "一鍵複製";
+                    copyBtn.innerText = "一鍵複製 / Copy";
                     copyBtn.style.backgroundColor = "#2e7d32";
                 }, 2000);
             })
-            .catch(() => { alert("複製失敗，請手動複製文字！"); });
+            .catch(() => { alert("複製失敗，請手動複製！/ Copy failed, please copy manually."); });
     }
 </script>
 </body>
