@@ -25,7 +25,7 @@
         .result-box h3 { margin-top: 0; color: #2e7d32; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
         .copy-btn { width: auto; padding: 6px 12px; font-size: 13px; background-color: #2e7d32; margin-bottom: 0; }
         .copy-btn:hover { background-color: #1b5e20; }
-        .text-output { width: 100%; height: 210px; background-color: #fff; border: 1px solid #c8e6c9; border-radius: 4px; padding: 10px; font-size: 13px; color: #333; resize: none; font-family: monospace; line-height: 1.5; }
+        .text-output { width: 100%; height: 230px; background-color: #fff; border: 1px solid #c8e6c9; border-radius: 4px; padding: 10px; font-size: 13px; color: #333; resize: none; font-family: monospace; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -38,9 +38,10 @@
             <label>所屬部門 <span>Department</span></label>
             <select id="department" required>
                 <option value="" disabled selected>請選擇部門 / Select Department</option>
+                <option value="製造部">製造部 / Manufacturing</option>
                 <option value="管理部">管理部 / Management</option>
                 <option value="業務部">業務部 / Sales</option>
-                <option value="製造部">製造部 / Manufacturing</option>
+                <option value="行銷部">行銷部 / Marketing</option>
                 <option value="財會部">財會部 / Finance</option>
             </select>
         </div>
@@ -53,6 +54,18 @@
         <div class="form-group">
             <label>請假日期 <span>Date</span></label>
             <input type="date" id="date" required>
+        </div>
+
+        <div class="form-group">
+            <label>請假種類 <span>Type of Leave</span></label>
+            <select id="leaveType" required>
+                <option value="" disabled selected>請選擇請假種類 / Select Leave Type</option>
+                <option value="特休">特休 / Annual Leave</option>
+                <option value="事假">事假 / Personal Leave</option>
+                <option value="公假">公假 / Official Leave</option>
+                <option value="病假">病假 / Sick Leave</option>
+                <option value="其他">其他 / Other</option>
+            </select>
         </div>
 
         <div class="time-range-group form-group">
@@ -89,7 +102,6 @@
 </div>
 
 <script>
-    // 延用你最新發佈的 GAS 網址
     const gasWebUrl = "https://script.google.com/macros/s/AKfycbzUhkp0A2__Mnf-A3nD2fjBVLfGExLXiNnl3CDJbKU3Ykg0Ua85G9fN9kYWdaz1GhXN/exec"; 
 
     const startTimeInput = document.getElementById('startTime');
@@ -132,9 +144,11 @@
 
         const formattedTimeRange = `${startTimeInput.value} ~ ${endTimeInput.value}`;
         const selectedDept = document.getElementById('department').value;
+        const selectedLeaveType = document.getElementById('leaveType').value;
         
-        // 對應英文部門名稱，優化 LINE 訊息顯示
+        // 部門中英對照
         const deptMap = {
+            "製造部": "製造部 (Manufacturing)",
             "管理部": "管理部 (Management)",
             "業務部": "業務部 (Sales)",
             "行銷部": "行銷部 (Marketing)",
@@ -143,10 +157,21 @@
         };
         const displayDept = deptMap[selectedDept] || selectedDept;
 
+        // 請假種類中英對照
+        const leaveTypeMap = {
+            "特休": "特休 (Annual Leave)",
+            "事假": "事假 (Personal Leave)",
+            "公假": "公假 (Official Leave)",
+            "病假": "病假 (Sick Leave)",
+            "其他": "其他 (Other)"
+        };
+        const displayLeaveType = leaveTypeMap[selectedLeaveType] || selectedLeaveType;
+
         const formData = {
-            dept: selectedDept, // 傳給 Google 試算表依然保持乾淨的中文，方便後續統計
+            dept: selectedDept, 
             name: document.getElementById('name').value,
             date: document.getElementById('date').value,
+            leaveType: selectedLeaveType, // 💡 新增傳遞請假種類給後台
             timeRange: formattedTimeRange,
             hours: hoursInput.value,
             reason: document.getElementById('reason').value
@@ -161,10 +186,10 @@
             if(data.status === 'success') {
                 alert('🎉 請假登記成功！\nApplication submitted successfully!');
                 
-                // LINE 複製框內容升級為「中英雙語對照」
                 const lineMessage = `📢 【請假報告 / Leave Notification】\n` +
                                     `▪️ 部門/Dept：${displayDept}\n` +
                                     `▪️ 姓名/Name：${formData.name}\n` +
+                                    `▪️ 假別/Type：${displayLeaveType}\n` +
                                     `▪️ 日期/Date：${formData.date}\n` +
                                     `▪️ 時間/Time：${formData.timeRange}\n` +
                                     `▪️ 時數/Hours：${formData.hours} 小時/Hours\n` +
